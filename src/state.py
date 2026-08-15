@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from models import FetchJobSuccess
+from src.models import FetchJobSuccess
 
 
 class State(TypedDict):

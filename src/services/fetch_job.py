@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 import httpx
 from bs4 import BeautifulSoup, Comment, Tag
 
-from models import FetchJobFailed, FetchJobResult
+from src.models import FetchJobFailed, FetchJobResult
 
 # ---------------------------------------------------------------------------
 # Constants
