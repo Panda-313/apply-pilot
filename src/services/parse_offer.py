@@ -1,3 +1,5 @@
+from typing import cast
+
 from dotenv import load_dotenv
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
@@ -11,7 +13,7 @@ from src.utils import ensure_api_key
 
 load_dotenv()
 
-def parse_offer(offer: FetchJobSuccess):
+def parse_offer(offer: FetchJobSuccess) -> StructuredOffer:
     ensure_api_key()
 
     llm = ChatOpenAI(model=BASE_NODE_MODEL, temperature=0)
@@ -22,9 +24,9 @@ def parse_offer(offer: FetchJobSuccess):
         HumanMessage(content=f"Offer title: {offer['title']} \n\nExtract the structured information from the following job offer text: {offer['cleaned_text']}")
     ])
 
-    structured_offer = structured_llm.invoke(prompt.format_messages())
+    structured_offer = cast(StructuredOffer,structured_llm.invoke(prompt.format_messages()))
 
-    print(structured_offer)
+    return structured_offer
 
 def main() -> int:
     parse_offer(fetch_job('https://nofluffjobs.com/job/senior-java-cloud-developer-azure-dahliamatic-warszawa-1'))
