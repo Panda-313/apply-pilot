@@ -21,7 +21,6 @@ def fit_analyst_node(state: State) -> dict:
     prompt = ChatPromptTemplate.from_messages([system_message, human_message])
     result = cast(FitAnalystResult, structured_llm.invoke(prompt.format_messages()))
 
-    pprint(result)
     return {
         "fit_score": result.fit_score,
         "fit_gaps": result.fit_gaps,
