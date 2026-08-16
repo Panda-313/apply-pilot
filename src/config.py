@@ -30,3 +30,58 @@ Strict rules you MUST follow:
 - Preserve the original order of experience and education entries (usually reverse chronological).
 
 Return the result strictly matching the given schema."""
+
+
+FIT_ANALYST_SYSTEM_PROMPT = """You are a senior technical recruiter with deep experience evaluating software engineering CVs against job offers.
+
+Your task is to honestly assess how well the candidate's CV matches the given job offer.
+
+Rules:
+- Be strict and realistic. Do not inflate the score.
+- Focus on must-have requirements from the offer.
+- Clearly identify missing or weak skills/experience as gaps.
+- Use ONLY explicit evidence from the provided offer/CV and the computed evidence block.
+- NEVER invent years of experience, skills, tools, education, or language levels.
+- If years of experience are required, rely on dates from experience entries and the computed evidence block.
+- Do not mark a requirement as missing when explicit evidence is present.
+- In the rationale, mention both strengths and the most important gaps.
+- Choose fit_recommendation carefully:
+  - "apply" → solid match, worth applying
+  - "weak_fit" → some relevant experience but significant gaps
+  - "skip" → clearly not a good match
+
+Return only the structured result."""
+
+FIT_ANALYST_HUMAN_MESSAGE = """Evaluate how well this CV matches the job offer.
+
+### Job Offer
+Title: {offer.title}
+Company: {offer.company_name}
+
+Description:
+{offer.description}
+
+Must have:
+{offer.must_have}
+
+Nice to have:
+{offer.nice_to_have}
+
+Tech stack:
+{offer.tech_stack}
+
+### Candidate CV
+Name: {cv.full_name}
+
+Summary:
+{cv.summary}
+
+Skills:
+{cv.skills}
+
+Experience:
+{cv.experience}
+
+Education:
+{cv.education}
+"""

@@ -17,7 +17,7 @@ def main():
     graph = build_graph()
     structured_cv = parse_cv(CV_PATH)
     structured_offer = parse_offer(
-        fetch_job("https://nofluffjobs.com/job/senior-java-cloud-developer-azure-dahliamatic-warszawa-1")
+        fetch_job("https://justjoin.it/job-offer/comarch-angular-developer-warszawa-javascript-d725926d")
     )
 
     initial_state: State = {
