@@ -12,5 +12,6 @@ StateStatus = Literal[
         "mail_written",
         "awaiting_outreach_approval",
         "outreach_rejected",
-        "ready_for_export"
+        "ready_for_export",
+        "rejected"
     ]

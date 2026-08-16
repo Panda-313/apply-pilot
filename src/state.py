@@ -16,6 +16,8 @@ class State(TypedDict):
     fit_rationale: Optional[str]
     fit_recommendation: Optional[FitRecommendation]
 
+    analysis_feedback: Optional[str]
+
     company_name: Optional[str]
     company_type: Optional[CompanyType]
     company_summary: Optional[str]

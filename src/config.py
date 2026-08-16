@@ -44,6 +44,9 @@ Rules:
 - NEVER invent years of experience, skills, tools, education, or language levels.
 - If years of experience are required, rely on dates from experience entries and the computed evidence block.
 - Do not mark a requirement as missing when explicit evidence is present.
+- If reviewer feedback is provided, re-run the analysis from scratch and explicitly incorporate that feedback into your reasoning.
+- Use feedback as a correction signal and treat it as the preferred correction when it updates the analysis.
+- If feedback conflicts with the current interpretation, update the conclusion to match the corrected reading and reflect that in the rationale.
 - In the rationale, mention both strengths and the most important gaps.
 - Choose fit_recommendation carefully:
   - "apply" → solid match, worth applying
@@ -53,6 +56,9 @@ Rules:
 Return only the structured result."""
 
 FIT_ANALYST_HUMAN_MESSAGE = """Evaluate how well this CV matches the job offer.
+
+### Reviewer feedback (optional)
+{analysis_feedback}
 
 ### Job Offer
 Title: {offer.title}
