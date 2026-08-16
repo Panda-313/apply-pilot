@@ -91,3 +91,15 @@ Experience:
 Education:
 {cv.education}
 """
+
+COMPANY_RESEARCH_PROMPT = """
+Research the company: "{company_name}".
+
+Additional context from the job offer:
+{offer_description}
+
+Determine:
+- the most accurate company name
+- whether it is a product company, outsourcing/body-leasing, or unknown
+- a short factual summary
+"""

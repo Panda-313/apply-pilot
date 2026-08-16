@@ -5,7 +5,7 @@ StateStatus = Literal[
         "fit_analyzed",
         "awaiting_fit_approval",
         "fit_rejected",
-        "researching_company",
+        "company_researched",
         "company_filtered",
         "company_skipped",
         "cv_tailored",

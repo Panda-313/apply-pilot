@@ -7,7 +7,7 @@ def fit_analyst_router(state: State):
     status = state["status"]
 
     if status == "fit_analyzed":
-        return END
+        return 'company_research_node'
 
     if status == "rejected":
         return END

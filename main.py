@@ -1,6 +1,7 @@
 import uuid
 
 from dotenv import load_dotenv
+load_dotenv()
 
 from src.cli import run_graph
 from src.config import CV_PATH
@@ -9,8 +10,6 @@ from src.services import fetch_job
 from src.services.parse_cv import parse_cv
 from src.services.parse_offer import parse_offer
 from src import State
-
-load_dotenv()
 
 
 def main():
