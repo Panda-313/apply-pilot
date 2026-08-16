@@ -3,9 +3,9 @@ from typing import TypedDict, Optional, Annotated
 from langchain_core.messages import BaseMessage
 from langgraph.graph import add_messages
 
-from models import FitRecommendation, CompanyType, StateStatus
-from models.structured_cv import StructuredCV
-from models.structured_offer import StructuredOffer
+from src.models import FitRecommendation, CompanyType, StateStatus
+from src.models.structured_cv import StructuredCV
+from src.models.structured_offer import StructuredOffer
 
 class State(TypedDict):
     offer: StructuredOffer

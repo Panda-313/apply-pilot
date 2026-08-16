@@ -21,6 +21,7 @@ dependencies = [
 [project.scripts]
 parse-offer = "src.services.parse_offer:main"
 parse-cv = "src.services.parse_cv:main"
+graph = "src.services.parse_cv:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
