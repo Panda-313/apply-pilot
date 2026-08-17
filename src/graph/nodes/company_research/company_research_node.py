@@ -1,4 +1,3 @@
-from pprint import pprint
 from typing import cast
 
 from langchain_core.messages import HumanMessage
@@ -24,13 +23,10 @@ def company_research_node(state: State) -> dict:
 
     final_message = agent_result["messages"][-1].content
     structured_llm = ChatOpenAI(model=BASE_NODE_MODEL, temperature=0).with_structured_output(CompanyResearchResult)
-    print(final_message)
     structured_result = cast(CompanyResearchResult, structured_llm.invoke(
         f"Extract the company research result from this text:\n\n{final_message}"
     ))
 
-    print("*" * 60)
-    pprint(structured_result)
     return {
         "company_name": structured_result.company_name,
         "company_type": structured_result.company_type,

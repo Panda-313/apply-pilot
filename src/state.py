@@ -3,6 +3,7 @@ from typing import TypedDict, Optional, Annotated
 from langchain_core.messages import BaseMessage
 from langgraph.graph import add_messages
 
+from src.models import TailoredCV
 from src.models import FitRecommendation, CompanyType, StateStatus
 from src.models.structured_cv import StructuredCV
 from src.models.structured_offer import StructuredOffer
@@ -23,7 +24,7 @@ class State(TypedDict):
     company_summary: Optional[str]
 
     cv_edits: Optional[dict]
-    tailored_cv: Optional[StructuredCV]
+    tailored_cv: Optional[TailoredCV]
 
     mail_draft: Optional[str]
 

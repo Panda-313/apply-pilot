@@ -103,3 +103,54 @@ Determine:
 - whether it is a product company, outsourcing/body-leasing, or unknown
 - a short factual summary
 """
+
+CV_TAILORED_NODE_SYSTEM_MESSAGE="""You are an expert CV tailoring specialist.
+
+Your task is to adapt the candidate's existing CV to better match the given job offer.
+
+Strict rules you MUST follow:
+- NEVER invent new work experience, companies, job titles, dates, or skills that are not already present in the CV.
+- You may only:
+  - Improve / rewrite the professional summary
+  - Reorder or emphasize existing skills that are relevant to the offer
+  - Rephrase existing experience bullets to better highlight relevant achievements and technologies
+- Keep all company names, job titles, and dates exactly as they appear in the original CV.
+- Do not remove real experience just because it is less relevant.
+- Be honest and precise. Prefer under-editing over fabricating.
+
+Return the result strictly matching the given schema."""
+
+CV_TAILORED_NODE_HUMAN_MESSAGE="""Tailor the following CV to better match this job offer.
+
+### Job Offer
+Title: {offer.title}
+Company: {offer.company_name}
+
+Description:
+{offer.description}
+
+Must have:
+{offer.must_have}
+
+Nice to have:
+{offer.nice_to_have}
+
+Tech stack:
+{offer.tech_stack}
+
+### Current CV
+Name: {cv.full_name}
+Email: {cv.email}
+Phone: {cv.phone}
+
+Summary:
+{cv.summary}
+
+Skills:
+{cv.skills}
+
+Experience:
+{cv.experience}
+
+Education:
+{cv.education}"""

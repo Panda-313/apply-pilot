@@ -2,6 +2,7 @@ from .not_trasformed_offer import FetchJobSuccess, FetchJobResult, FetchJobFaile
 from .company_type import CompanyType
 from .fit_recommendation import FitRecommendation
 from .state_status import StateStatus
+from .structured_cv import StructuredCV, TailoredCV
 
 __all__ = [
     'FetchJobSuccess',
@@ -10,4 +11,6 @@ __all__ = [
     'CompanyType',
     'FitRecommendation',
     'StateStatus',
+    'StructuredCV',
+    'TailoredCV',
 ]

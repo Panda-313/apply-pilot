@@ -1,16 +1,9 @@
 from langchain.agents import create_agent
-from langchain.tools import tool
+from langchain_community.tools import DuckDuckGoSearchRun
 
 from src.config import BASE_NODE_MODEL
 
-
-@tool
-def web_search(query: str) -> str:
-    """Search the web for information about a company."""
-    return f"Search results for: {query}"
-
-
-tools = [web_search]
+ddg_tool = DuckDuckGoSearchRun()
 
 system_prompt = (
     "You are a company research specialist. "
@@ -21,6 +14,6 @@ system_prompt = (
 
 company_researcher_agent = create_agent(
     model=BASE_NODE_MODEL,
-    tools=tools,
+    tools=[ddg_tool],
     system_prompt=system_prompt,
 )

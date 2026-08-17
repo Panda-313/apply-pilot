@@ -15,7 +15,7 @@ class EducationItem(BaseModel):
     start_date: str | None = Field(description="Start date exactly as written")
     end_date: str | None = Field(description="End date exactly as written")
 
-class StructuredCV(BaseModel):
+class TailoredCV(BaseModel):
     full_name: str | None = Field(description="Full name of the candidate exactly as written")
     email: str | None = Field(description="Email address exactly as written")
     phone: str | None = Field(description="Phone number exactly as written")
@@ -25,4 +25,5 @@ class StructuredCV(BaseModel):
     experience: list[ExperienceItem] = Field(description="Work experience entries in reverse chronological order")
     education: list[EducationItem] = Field(description="Education entries")
 
+class StructuredCV(TailoredCV):
     raw_text: str = Field(description="Full original text extracted from the CV. Do not modify.")
