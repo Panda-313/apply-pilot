@@ -24,7 +24,6 @@ def cv_tailor_node(state: State) -> dict:
 
     result = llm_structured.invoke([system_message, human_message])
 
-    pprint(result)
 
     return {
         "cv_edits": result.cv_edits,

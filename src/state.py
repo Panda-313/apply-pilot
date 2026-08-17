@@ -26,6 +26,8 @@ class State(TypedDict):
     cv_edits: Optional[dict]
     tailored_cv: Optional[TailoredCV]
 
+    tailored_cv_feedback: Optional[str]
+
     mail_draft: Optional[str]
 
     status: StateStatus

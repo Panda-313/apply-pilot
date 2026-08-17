@@ -25,6 +25,8 @@ def main():
         "fit_score": None,
         "fit_gaps": [],
         "fit_rationale": None,
+        "analysis_feedback": None,
+        "tailored_cv_feedback": None,
         "fit_recommendation": None,
         "company_name": None,
         "company_type": None,
