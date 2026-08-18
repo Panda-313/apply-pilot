@@ -17,7 +17,7 @@ Return the result strictly matching the given schema."""
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-CV_PATH = PROJECT_ROOT / "src" / "data" / "CV_Mikolaj_Cieslinski-doc.docx"
+CV_PATH = PROJECT_ROOT / "src" / "data" / "CV_Mikolaj_Cieslinski-doc_tailored.docx"
 
 CV_PROMPT = """You are an expert CV parser. Your only task is to extract structured information from the provided CV text.
 
@@ -154,3 +154,110 @@ Experience:
 
 Education:
 {cv.education}"""
+
+DEFAULT_JOB_OFFER_URL = "https://justjoin.it/job-offer/comarch-angular-developer-warszawa-javascript-d725926d"
+DEMO_JOB_OFFER_URL = "https://nofluffjobs.com/job/senior-java-cloud-developer-azure-dahliamatic-warszawa-1"
+
+FETCH_JOB_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/120.0.0.0 Safari/537.36"
+)
+
+FETCH_JOB_NOISE_KEYWORDS: frozenset[str] = frozenset(
+    {
+        "cookie",
+        "banner",
+        "menu",
+        "sidebar",
+        "related",
+        "newsletter",
+        "advert",
+        "ads",
+        "ad-",
+        "promo",
+        "popup",
+        "modal",
+        "consent",
+        "gdpr",
+        "footer",
+        "header",
+        "nav-",
+        "navigation",
+        "social",
+        "share",
+        "subscribe",
+        "login",
+        "signup",
+        "register",
+        "breadcrumb",
+        "pagination",
+        "widget",
+        "tracking",
+    }
+)
+
+FETCH_JOB_REMOVE_TAGS: tuple[str, ...] = (
+    "script",
+    "style",
+    "noscript",
+    "iframe",
+    "svg",
+    "nav",
+    "footer",
+    "header",
+    "aside",
+    "form",
+)
+
+FETCH_JOB_NOISE_PHRASES: tuple[str, ...] = (
+    "accept cookies",
+    "cookie policy",
+    "all rights reserved",
+    "© ",
+    "privacy policy",
+    "terms of service",
+    "terms of use",
+)
+
+FETCH_JOB_MIN_CONTENT_LENGTH = 300
+
+APPLY_CV_EDITS_SYSTEM_PROMPT = """
+You are an expert at editing existing CVs while preserving their structure.
+
+You will receive:
+1. A numbered list of paragraphs extracted from a DOCX file
+2. The desired tailored content (TailoredCV)
+
+Your job is to decide which paragraphs should be updated and what their new text should be.
+
+Strict rules:
+- Only change content related to: professional summary, skills, and experience bullets.
+- NEVER change company names, job titles, or dates.
+- NEVER add new work experience entries.
+- NEVER invent skills or achievements that are not present in the TailoredCV.
+- Keep bullet point markers (-, •, *) if they exist.
+- Return the minimal set of changes necessary.
+- If a section does not exist in the original document, do not try to create it.
+
+Return only the structured list of changes.
+"""
+
+APPLY_CV_EDITS_HUMAN_TEMPLATE = """
+Here is the list of paragraphs from the original CV (index: text):
+
+{paragraphs_text}
+
+Here is the tailored content we want to apply:
+
+Summary:
+{summary}
+
+Skills:
+{skills}
+
+Experience:
+{experience}
+
+Return the list of paragraph changes needed.
+"""

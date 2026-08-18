@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
-from src.config import BASE_NODE_MODEL, PARSE_OFFER_PROMPT
+from src.config import BASE_NODE_MODEL, DEMO_JOB_OFFER_URL, PARSE_OFFER_PROMPT
 from src.models import FetchJobSuccess
 from src.models.structured_offer import StructuredOffer
 from src.services import fetch_job
@@ -29,7 +29,7 @@ def parse_offer(offer: FetchJobSuccess) -> StructuredOffer:
     return structured_offer
 
 def main() -> int:
-    parse_offer(fetch_job('https://nofluffjobs.com/job/senior-java-cloud-developer-azure-dahliamatic-warszawa-1'))
+    parse_offer(fetch_job(DEMO_JOB_OFFER_URL))
     return 0
 
 if __name__ == "__main__":

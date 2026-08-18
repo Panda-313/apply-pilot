@@ -21,6 +21,4 @@ def run_graph(graph, initial_state: State, config: dict):
         resume_value = handle_interrupt(interrupt_value)
 
         graph.invoke(Command(resume=resume_value), config=config)
-
-
-
+    return snapshot.values
