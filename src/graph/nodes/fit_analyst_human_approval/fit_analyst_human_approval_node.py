@@ -5,6 +5,17 @@ from src.graph.nodes.fit_analyst_human_approval import FitAnalystHumanApprovalRe
 from src import State
 
 
+def _append_feedback(previous: str | None, latest: str) -> str | None:
+    latest = latest.strip()
+    if not latest:
+        return previous
+
+    if not previous:
+        return latest
+
+    return f"{previous}\n\n---\nAdditional reviewer feedback:\n{latest}"
+
+
 def fit_analyst_human_approval_node(state: State) -> FitAnalystHumanApprovalResult:
     human_decision = interrupt({
         "type": "fit_analyst_approval",
@@ -35,7 +46,7 @@ def fit_analyst_human_approval_node(state: State) -> FitAnalystHumanApprovalResu
 
     return {
         "status": "initialized",
-        "analysis_feedback": feedback,
+        "analysis_feedback": _append_feedback(state.get("analysis_feedback"), feedback),
         "messages": [
             HumanMessage(content=f"Added feedback to fit analysis, redoing")
         ]

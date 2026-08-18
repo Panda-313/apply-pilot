@@ -5,6 +5,17 @@ from .schema import CVTailorHumanApprovalResult
 from src import State
 
 
+def _append_feedback(previous: str | None, latest: str) -> str | None:
+    latest = latest.strip()
+    if not latest:
+        return previous
+
+    if not previous:
+        return latest
+
+    return f"{previous}\n\n---\nAdditional reviewer feedback:\n{latest}"
+
+
 def cv_tailor_human_approval_node(state: State) -> CVTailorHumanApprovalResult:
     human_decision = interrupt({
         "type": "cv_tailor_approval",
@@ -32,7 +43,7 @@ def cv_tailor_human_approval_node(state: State) -> CVTailorHumanApprovalResult:
 
     return {
         "status": "cv_tailored",
-        "tailored_cv_feedback": feedback,
+        "tailored_cv_feedback": _append_feedback(state.get("tailored_cv_feedback"), feedback),
         "messages": [
             HumanMessage(content="Added feedback to tailored CV, redoing")
         ]

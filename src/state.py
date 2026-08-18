@@ -1,4 +1,5 @@
 from typing import TypedDict, Optional, Annotated
+from typing import Literal
 
 from langchain_core.messages import BaseMessage
 from langgraph.graph import add_messages
@@ -18,6 +19,7 @@ class State(TypedDict):
     fit_recommendation: Optional[FitRecommendation]
 
     analysis_feedback: Optional[str]
+    fit_analysis_cv_source: Optional[Literal["cv", "tailored_cv"]]
 
     company_name: Optional[str]
     company_type: Optional[CompanyType]

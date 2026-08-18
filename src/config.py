@@ -117,10 +117,14 @@ Strict rules you MUST follow:
 - Keep all company names, job titles, and dates exactly as they appear in the original CV.
 - Do not remove real experience just because it is less relevant.
 - Be honest and precise. Prefer under-editing over fabricating.
+- If reviewer feedback is provided, re-tailor the CV from scratch and explicitly apply that feedback as the primary correction signal.
 
 Return the result strictly matching the given schema."""
 
 CV_TAILORED_NODE_HUMAN_MESSAGE="""Tailor the following CV to better match this job offer.
+
+### Reviewer feedback (optional)
+{tailored_cv_feedback}
 
 ### Job Offer
 Title: {offer.title}
