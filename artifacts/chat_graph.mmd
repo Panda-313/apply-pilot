@@ -1,0 +1,26 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	fit_analyst_node(fit_analyst_node)
+	analyst_human_approval_node(analyst_human_approval_node)
+	company_research_node(company_research_node)
+	cv_tailor_node(cv_tailor_node)
+	cv_tailor_human_approval_node(cv_tailor_human_approval_node)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> fit_analyst_node;
+	analyst_human_approval_node -.-> __end__;
+	analyst_human_approval_node -.-> company_research_node;
+	analyst_human_approval_node -.-> fit_analyst_node;
+	company_research_node --> cv_tailor_node;
+	cv_tailor_human_approval_node -.-> __end__;
+	cv_tailor_human_approval_node -.-> cv_tailor_node;
+	cv_tailor_node --> fit_analyst_node;
+	fit_analyst_node -.-> analyst_human_approval_node;
+	fit_analyst_node -.-> cv_tailor_human_approval_node;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

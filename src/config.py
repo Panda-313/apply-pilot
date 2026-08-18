@@ -118,6 +118,8 @@ Strict rules you MUST follow:
 - Do not remove real experience just because it is less relevant.
 - Be honest and precise. Prefer under-editing over fabricating.
 - If reviewer feedback is provided, re-tailor the CV from scratch and explicitly apply that feedback as the primary correction signal.
+- Use the company research profile to tailor emphasis in the summary, skills ordering, and experience bullet phrasing so it matches the company's context.
+- If company research fields are missing or unknown, fall back to tailoring against the offer only.
 
 Return the result strictly matching the given schema."""
 
@@ -141,6 +143,12 @@ Nice to have:
 
 Tech stack:
 {offer.tech_stack}
+
+### Company profile (from research)
+Company name: {company_name}
+Company type: {company_type}
+Company summary:
+{company_summary}
 
 ### Current CV
 Name: {cv.full_name}
