@@ -48,6 +48,12 @@ class ApplicationService:
 
         return result, config["configurable"]["thread_id"]
 
-
+    def get_application_by_id(self, application_id: str) -> State | None:
+        self._ensure_graph()
+        config = {"configurable": {"thread_id": application_id}}
+        state_snapshot = self.graph.get_state(config)
+        if state_snapshot.values:
+            return state_snapshot.values
+        return None
 
 

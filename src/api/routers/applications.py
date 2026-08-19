@@ -1,7 +1,8 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 
+from src import State
 from src.services import fetch_job
 from src.api.services import ApplicationService, ParsingService
 from src.api.schemas import NewApplicationResponse, NewApplicationRequest
@@ -41,7 +42,17 @@ def create_application(
         fetch_job(request.offer_url),
     )
 
-
     state, config_id = application_service.create_application(structured_cv, structured_offer)
 
     return NewApplicationResponse(status=state["status"], id=config_id)
+
+
+@router.get("/{id}", response_model=State, summary="Get application by id")
+def get_application(id: str, service: ApplicationServiceDep):
+    application = service.get_application_by_id(id)
+    
+    if application is None:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    return application
+
