@@ -7,14 +7,14 @@ from src.cli import run_graph
 from src.config import CV_PATH, DEFAULT_JOB_OFFER_URL
 from src.graph import build_graph
 from src.services import fetch_job, apply_cv_edits
-from src.services.parse_cv import parse_cv
+from src.services.parse_cv import parse_cv_from_path
 from src.services.parse_offer import parse_offer
 from src import State
 
 
 def main():
     graph = build_graph()
-    structured_cv = parse_cv(CV_PATH)
+    structured_cv = parse_cv_from_path(CV_PATH)
     structured_offer = parse_offer(
         fetch_job(DEFAULT_JOB_OFFER_URL)
     )
@@ -25,6 +25,7 @@ def main():
         "fit_score": None,
         "fit_gaps": [],
         "fit_rationale": None,
+        "fit_analysis_cv_source": None,
         "analysis_feedback": None,
         "tailored_cv_feedback": None,
         "fit_recommendation": None,

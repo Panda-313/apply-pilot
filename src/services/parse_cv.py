@@ -13,7 +13,28 @@ from src.utils import ensure_api_key
 
 load_dotenv()
 
-def parse_cv(cv_path: Path) -> StructuredCV:
+def parse_cv(cv: Document) -> StructuredCV:
+    ensure_api_key()
+
+    text = "\n".join(
+        paragraph.text
+        for paragraph in cv.paragraphs
+    )
+
+
+    llm = ChatOpenAI(model=BASE_NODE_MODEL, temperature=0)
+    structured_llm = llm.with_structured_output(StructuredCV)
+
+    prompt = ChatPromptTemplate.from_messages([
+        SystemMessage(content=CV_PROMPT),
+        HumanMessage(content=f"Extract the structured information from the following CV text:\n\n{text}")
+    ])
+
+    result = cast(StructuredCV, structured_llm.invoke(prompt.format_messages()))
+
+    return result
+
+def parse_cv_from_path(cv_path: Path) -> StructuredCV:
     ensure_api_key()
 
     doc = Document(str(cv_path))
@@ -37,7 +58,7 @@ def parse_cv(cv_path: Path) -> StructuredCV:
 
 
 def main() -> int:
-    result = parse_cv(CV_PATH)
+    result = parse_cv_from_path(CV_PATH)
     print(result)
     return 0
 
