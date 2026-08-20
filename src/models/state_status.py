@@ -7,9 +7,5 @@ StateStatus = Literal[
         "company_researched",
         "cv_tailored",
         "cv_tailored_approved",
-        "mail_written",
-        "awaiting_outreach_approval",
-        "outreach_rejected",
-        "ready_for_export",
         "rejected"
     ]

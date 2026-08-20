@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, HTTPException
 
-from src import State
+from src.api.schemas import AllowedActions, Payload, DecisionRequest
 from src.services import fetch_job
 from src.api.services import ApplicationService, ParsingService
 from src.api.schemas import NewApplicationResponse, NewApplicationRequest
@@ -44,15 +44,82 @@ def create_application(
 
     state, config_id = application_service.create_application(structured_cv, structured_offer)
 
-    return NewApplicationResponse(status=state["status"], id=config_id)
+    return NewApplicationResponse(
+        status=state["status"],
+        id=config_id,
+        interrupted=True,
+        allowed_actions=[
+            AllowedActions.RESUME,
+            AllowedActions.EXIT,
+            AllowedActions.FEEDBACK,
+        ],
+        payload=Payload(fit_score=state["fit_score"], fit_gaps=state["fit_gaps"], fit_rationale=state["fit_rationale"],
+                        fit_recommendation=state["fit_recommendation"]),
+    )
 
 
-@router.get("/{id}", response_model=State, summary="Get application by id")
+@router.get("/{id}", response_model=NewApplicationResponse, summary="Get application by id")
 def get_application(id: str, service: ApplicationServiceDep):
     application = service.get_application_by_id(id)
-    
+
     if application is None:
         raise HTTPException(status_code=404, detail="Application not found")
 
-    return application
+    return NewApplicationResponse(
+        status=application["status"],
+        id=id,
+        interrupted=True,
+        allowed_actions=[
+            AllowedActions.RESUME,
+            AllowedActions.EXIT,
+            AllowedActions.FEEDBACK,
+        ] if application["status"] == 'awaiting_fit_approval' or application["status"] == 'cv_tailored' else [],
+        payload=Payload(
+            fit_score=application.get("fit_score"),
+            fit_gaps=application.get("fit_gaps"),
+            fit_rationale=application.get("fit_rationale"),
+            fit_recommendation=application.get("fit_recommendation"),
+            offer=application.get("offer"),
+            cv_edits=application.get("cv_edits"),
+            tailored_cv=application.get("tailored_cv"),
+            tailored_cv_feedback=application.get("tailored_cv_feedback"),
+            company_name=application.get("company_name"),
+            company_type=application.get("company_type"),
+            company_summary=application.get("company_summary"),
+        ),
+    )
+
+@router.post("/{id}/decision", response_model=NewApplicationResponse, summary="Give human decision")
+def decision(
+        id: str,
+        application_service: ApplicationServiceDep,
+        request: DecisionRequest,
+):
+    application =  application_service.submit_decision(id,request)
+
+    return NewApplicationResponse(
+        status=application["status"],
+        id=id,
+        interrupted=True,
+        allowed_actions=[
+            AllowedActions.RESUME,
+            AllowedActions.EXIT,
+            AllowedActions.FEEDBACK,
+        ] if application["status"] == 'awaiting_fit_approval' or application["status"] == 'cv_tailored' else [],
+        payload=Payload(
+            fit_score=application.get("fit_score"),
+            fit_gaps=application.get("fit_gaps"),
+            fit_rationale=application.get("fit_rationale"),
+            fit_recommendation=application.get("fit_recommendation"),
+            offer=application.get("offer"),
+            cv_edits=application.get("cv_edits"),
+            tailored_cv=application.get("tailored_cv"),
+            tailored_cv_feedback=application.get("tailored_cv_feedback"),
+            company_name=application.get("company_name"),
+            company_type=application.get("company_type"),
+            company_summary=application.get("company_summary"),
+        ),
+    )
+
+
 

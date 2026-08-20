@@ -25,7 +25,7 @@ class State(TypedDict):
     company_type: Optional[CompanyType]
     company_summary: Optional[str]
 
-    cv_edits: Optional[dict]
+    cv_edits: Optional[str]
     tailored_cv: Optional[TailoredCV]
 
     tailored_cv_feedback: Optional[str]

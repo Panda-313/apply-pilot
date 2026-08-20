@@ -1,5 +1,8 @@
 import uuid
 
+from src.api.schemas import DecisionRequest
+from langgraph.types import Command
+
 from src import State
 from src.graph import build_graph
 
@@ -57,3 +60,15 @@ class ApplicationService:
         if state_snapshot.values:
             return state_snapshot.values
         return None
+
+    def submit_decision(self, id: str, request: DecisionRequest) -> State | None:
+        self._ensure_graph()
+
+        config = self._create_config(id)
+
+        result = self.graph.invoke(
+            Command(resume={"action": request.action, "feedback": request.feedback}),
+            config
+        )
+
+        return result
