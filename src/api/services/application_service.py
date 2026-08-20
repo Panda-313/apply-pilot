@@ -13,6 +13,12 @@ class ApplicationService:
         if self.graph is None:
             self.graph = build_graph(self.checkpointer)
 
+    def _create_config(self, thread_id: str):
+        return {
+            "configurable": {
+                "thread_id": thread_id
+            }
+        }
 
     def create_application(self, structured_cv, structured_offer):
         self._ensure_graph()
@@ -38,11 +44,7 @@ class ApplicationService:
             "messages": [],
         }
 
-        config = {
-            "configurable": {
-                "thread_id": uuid.uuid4().hex[:8]
-            }
-        }
+        config = self._create_config(uuid.uuid4().hex[:8])
 
         result = self.graph.invoke(initial_state, config)
 
@@ -50,10 +52,8 @@ class ApplicationService:
 
     def get_application_by_id(self, application_id: str) -> State | None:
         self._ensure_graph()
-        config = {"configurable": {"thread_id": application_id}}
+        config = self._create_config(application_id)
         state_snapshot = self.graph.get_state(config)
         if state_snapshot.values:
             return state_snapshot.values
         return None
-
-
