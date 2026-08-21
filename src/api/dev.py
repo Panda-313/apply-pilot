@@ -6,9 +6,11 @@ from src.api.services.parsing_service import ParsingService
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
+from src.api.exceptions import ApiError
 from src.api.services import ApplicationService
 from langgraph.checkpoint.memory import InMemorySaver
 
@@ -46,6 +48,20 @@ app.add_middleware(
 )
 
 app.include_router(applications_router)
+
+
+@app.exception_handler(ApiError)
+async def api_error_handler(_: Request, exc: ApiError):
+    payload = {
+        "error": {
+            "code": exc.code,
+            "message": exc.message,
+        }
+    }
+    if exc.details is not None:
+        payload["error"]["details"] = exc.details
+
+    return JSONResponse(status_code=exc.status_code, content=payload)
 
 @app.get(
     "/health",
