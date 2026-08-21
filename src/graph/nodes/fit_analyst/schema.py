@@ -1,6 +1,10 @@
+from typing import TypedDict, Literal
+
 from pydantic import BaseModel, Field
 
-from src.models import FitRecommendation
+from src.models import FitRecommendation, StateStatus
+from src.state_updates import FitAnalystUpdate
+
 
 class FitAnalystResult(BaseModel):
     fit_score: float = Field(description="Overall match score from 0 to 10 (10 = perfect match)")

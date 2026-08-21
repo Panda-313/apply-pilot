@@ -1,6 +1,10 @@
+from typing import TypedDict
+
 from pydantic import BaseModel, Field
 
-from src.models import CompanyType
+from src.models import CompanyType, StateStatus
+from src.state_updates import CompanyResearchUpdate
+
 
 class CompanyResearchResult(BaseModel):
     company_name: str = Field(description="Official or most commonly used company name")

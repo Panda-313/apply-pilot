@@ -6,10 +6,11 @@ from langchain_openai import ChatOpenAI
 
 from src.config import BASE_NODE_MODEL, FIT_ANALYST_SYSTEM_PROMPT, FIT_ANALYST_HUMAN_MESSAGE
 from .schema import FitAnalystResult
+from src.state_updates import FitAnalystUpdate
 from src import State
 
 
-def fit_analyst_node(state: State) -> dict:
+def fit_analyst_node(state: State) -> FitAnalystUpdate:
     llm = ChatOpenAI(model=BASE_NODE_MODEL, temperature=0)
 
     structured_llm = llm.with_structured_output(FitAnalystResult)

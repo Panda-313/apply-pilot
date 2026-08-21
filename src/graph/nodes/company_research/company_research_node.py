@@ -6,9 +6,10 @@ from langchain_openai import ChatOpenAI
 from src.config import COMPANY_RESEARCH_PROMPT, BASE_NODE_MODEL
 from src.graph.nodes.company_research import CompanyResearchResult
 from src.graph.nodes.company_research.agents import company_researcher_agent
+from src.state_updates import CompanyResearchUpdate
 from src import State
 
-def company_research_node(state: State) -> dict:
+def company_research_node(state: State) -> CompanyResearchUpdate:
     company_name = state["offer"].company_name
     offer_description = state["offer"].description
 

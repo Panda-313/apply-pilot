@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
 
-from src.models.structured_cv import StructuredCV, TailoredCV
+from src.models import StateStatus
+from src.models.structured_cv import TailoredCV
+from src.state_updates import CVTailorUpdate
 
 
 class CVTailoredResult(BaseModel):

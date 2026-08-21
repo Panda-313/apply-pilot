@@ -2,12 +2,13 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 from .schema import CVTailoredResult
+from src.state_updates import CVTailorUpdate
 from src.config import BASE_NODE_MODEL, CV_TAILORED_NODE_SYSTEM_MESSAGE, \
     CV_TAILORED_NODE_HUMAN_MESSAGE
 from src import State
 
 
-def cv_tailor_node(state: State) -> dict:
+def cv_tailor_node(state: State) -> CVTailorUpdate:
     llm = ChatOpenAI(model=BASE_NODE_MODEL, temperature=0)
 
     llm_structured = llm.with_structured_output(CVTailoredResult)
