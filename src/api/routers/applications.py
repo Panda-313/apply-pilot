@@ -1,11 +1,16 @@
 from typing import Annotated
+from tempfile import NamedTemporaryFile
 
 from fastapi import APIRouter, Depends, Request, HTTPException
+from fastapi.responses import StreamingResponse
 
 from src.api.schemas import AllowedActions, Payload, DecisionRequest
+from src.config import CV_PATH
 from src.services import fetch_job
 from src.api.services import ApplicationService, ParsingService
 from src.api.schemas import NewApplicationResponse, NewApplicationRequest
+from src.models import TailoredCV
+from src.services import apply_cv_edits
 
 router = APIRouter(
     prefix='/applications',
@@ -121,5 +126,27 @@ def decision(
         ),
     )
 
+@router.get("/{id}/cv", summary="Download tailored CV as .docx")
+def get_cv(id: str, service: ApplicationServiceDep):
+    application = service.get_application_by_id(id)
 
+    if application is None:
+        raise HTTPException(status_code=404, detail="Application not found")
 
+    tailored_cv = application.get("tailored_cv")
+    if tailored_cv is None:
+        raise HTTPException(status_code=409, detail="Tailored CV is not ready yet")
+
+    with NamedTemporaryFile(suffix=".docx", delete=False) as tmp_file:
+        output_path = tmp_file.name
+
+    generated_path = apply_cv_edits(CV_PATH, tailored_cv, output_path)
+    with open(generated_path, "rb") as file:
+        content = file.read()
+    generated_path.unlink()
+
+    return StreamingResponse(
+        iter([content]),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f"attachment; filename=cv_{id}.docx"},
+    )
