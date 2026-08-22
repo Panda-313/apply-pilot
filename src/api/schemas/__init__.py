@@ -3,5 +3,15 @@ from src.api.schemas.new_application_request import NewApplicationRequest
 from src.api.schemas.allowed_actions import AllowedActions
 from src.api.schemas.payload import Payload
 from src.api.schemas.decision_request import DecisionRequest
+from src.api.schemas.interview_message_request import InterviewMessageRequest
+from src.api.schemas.interview_message import InterviewMessage
 
-__all__ = ['DecisionRequest', "NewApplicationResponse", "NewApplicationRequest", "AllowedActions", "Payload"]
+__all__ = [
+    'DecisionRequest',
+    "NewApplicationResponse",
+    "NewApplicationRequest",
+    "AllowedActions",
+    "Payload",
+    "InterviewMessageRequest",
+    "InterviewMessage",
+]

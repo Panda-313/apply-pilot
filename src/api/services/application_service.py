@@ -45,6 +45,7 @@ class ApplicationService:
             "status": "initialized",
             "human_feedback": None,
             "messages": [],
+            "interview_messages": [],
         }
 
         config = self._create_config(uuid.uuid4().hex[:8])
@@ -68,6 +69,18 @@ class ApplicationService:
 
         result = self.graph.invoke(
             Command(resume={"action": request.action, "feedback": request.feedback}),
+            config
+        )
+
+        return result
+
+    def send_interview_message(self, id: str, message: str) -> State | None:
+        self._ensure_graph()
+
+        config = self._create_config(id)
+
+        result = self.graph.invoke(
+            Command(resume=message),
             config
         )
 

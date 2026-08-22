@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 
 from src.api.exceptions import ConflictError, NotFoundError, UnprocessableEntityError
-from src.api.schemas import AllowedActions, Payload, DecisionRequest
+from src.api.schemas import AllowedActions, Payload, DecisionRequest, InterviewMessageRequest, InterviewMessage
 from src.config import CV_PATH
 from src.api.services import ApplicationService, ParsingService
 from src.api.schemas import NewApplicationResponse, NewApplicationRequest
@@ -17,6 +17,7 @@ router = APIRouter(
 )
 
 DECISION_ALLOWED_STATUSES = {"awaiting_fit_approval", "cv_tailored"}
+INTERVIEW_ALLOWED_STATUSES = {"awaiting_interview"}
 
 
 def get_application_service(request: Request) -> ApplicationService:
@@ -30,12 +31,30 @@ def get_parsing_service(request: Request) -> ParsingService:
 ApplicationServiceDep = Annotated[ApplicationService, Depends(get_application_service)]
 ParsingServiceDep = Annotated[ParsingService, Depends(get_parsing_service)]
 
+
+def _convert_interview_messages(application: Mapping[str, Any]) -> list[InterviewMessage] | None:
+    raw_messages = application.get("interview_messages")
+    if not raw_messages:
+        return None
+    
+    result = []
+    for msg in raw_messages:
+        role = "assistant" if msg.type == "ai" else "user"
+        result.append(InterviewMessage(role=role, content=msg.content))
+    return result
+
+
 def _allowed_actions_for_status(status: str) -> list[AllowedActions]:
     if status in DECISION_ALLOWED_STATUSES:
         return [
             AllowedActions.RESUME,
             AllowedActions.EXIT,
             AllowedActions.FEEDBACK,
+        ]
+    if status in INTERVIEW_ALLOWED_STATUSES:
+        return [
+            AllowedActions.SEND_MESSAGE,
+            AllowedActions.EXIT,
         ]
     return []
 
@@ -58,6 +77,7 @@ def _to_application_response(application_id: str, application: Mapping[str, Any]
             company_name=application.get("company_name"),
             company_type=application.get("company_type"),
             company_summary=application.get("company_summary"),
+            interview_messages=_convert_interview_messages(application),
         ),
     )
 
@@ -162,3 +182,37 @@ def get_cv(id: str, service: ApplicationServiceDep):
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         headers={"Content-Disposition": f"attachment; filename=cv_{id}.docx"},
     )
+
+@router.post(
+    "/{id}/interview",
+    response_model=NewApplicationResponse,
+    summary="Send interview message",
+    description="Send a chat message in the interview phase",
+)
+def send_interview_message(
+        id: str,
+        application_service: ApplicationServiceDep,
+        request: InterviewMessageRequest,
+):
+    current_application = application_service.get_application_by_id(id)
+    if current_application is None:
+        raise NotFoundError(
+            code="application_not_found",
+            message=f"Application '{id}' was not found.",
+        )
+
+    if current_application["status"] not in INTERVIEW_ALLOWED_STATUSES:
+        raise ConflictError(
+            code="interview_not_active",
+            message=f"Application '{id}' is not currently in interview phase.",
+            details={"status": current_application["status"]},
+        )
+
+    application = application_service.send_interview_message(id, request.message)
+    if application is None:
+        raise NotFoundError(
+            code="application_not_found",
+            message=f"Application '{id}' was not found.",
+        )
+
+    return _to_application_response(id, application)
