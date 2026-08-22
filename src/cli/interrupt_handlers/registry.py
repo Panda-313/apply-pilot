@@ -2,11 +2,13 @@ from typing import Callable
 
 from .fit_analyst_approval import handle_fit_analyst_approval
 from .cv_tailor_approval import handle_cv_tailor_approval
+from .interview import handle_interview
 
 
 INTERRUPT_HANDLERS: dict[str, Callable[[dict], dict]] = {
     "fit_analyst_approval": handle_fit_analyst_approval,
     "cv_tailor_approval": handle_cv_tailor_approval,
+    "interview": handle_interview,
 }
 
 

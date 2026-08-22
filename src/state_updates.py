@@ -1,8 +1,9 @@
-from typing import Optional, Literal, TypedDict
+from typing import Optional, Literal, TypedDict, Annotated, NotRequired
 
-from src.models import CompanyType, FitRecommendation, StateStatus
-from src.models.structured_cv import TailoredCV
+from langchain_core.messages import BaseMessage
+from langgraph.graph import add_messages
 
+from src.models import CompanyType, FitRecommendation, StateStatus, Clarifications, TailoredCV
 
 class CompanyResearchUpdate(TypedDict):
     company_name: Optional[str]
@@ -23,4 +24,9 @@ class FitAnalystUpdate(TypedDict):
 class CVTailorUpdate(TypedDict):
     cv_edits: Optional[str]
     tailored_cv: Optional[TailoredCV]
+    status: StateStatus
+
+class CVInterviewUpdate(TypedDict):
+    interview_messages: Annotated[list[BaseMessage], add_messages]
+    clarifications: NotRequired[Optional[Clarifications]]
     status: StateStatus

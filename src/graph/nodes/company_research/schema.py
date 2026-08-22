@@ -1,9 +1,6 @@
-from typing import TypedDict
-
 from pydantic import BaseModel, Field
 
 from src.models import CompanyType, StateStatus
-from src.state_updates import CompanyResearchUpdate
 
 
 class CompanyResearchResult(BaseModel):

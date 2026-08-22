@@ -47,11 +47,29 @@ def apply_cv_edits(
         for b in exp.bullets:
             experience_text += f"- {b}\n"
 
+    education_text = ""
+    for edu in tailored_cv.education:
+        edu_line = edu.institution
+        if edu.degree:
+            edu_line += f" - {edu.degree}"
+        if edu.start_date or edu.end_date:
+            edu_line += f" ({edu.start_date or ''} - {edu.end_date or ''})"
+        education_text += f"{edu_line}\n"
+
+    languages_text = ""
+    if hasattr(tailored_cv, 'languages') and tailored_cv.languages:
+        for lang in tailored_cv.languages:
+            languages_text += f"{lang.language}: {lang.level}\n"
+    else:
+        languages_text = "Not specified"
+
     human_message = APPLY_CV_EDITS_HUMAN_TEMPLATE.format(
         paragraphs_text=paragraphs_text,
         summary=tailored_cv.summary,
         skills=", ".join(tailored_cv.skills),
         experience=experience_text.strip(),
+        education=education_text.strip() or "Not specified",
+        languages=languages_text.strip(),
     )
 
     llm = ChatOpenAI(model=BASE_NODE_MODEL, temperature=0)

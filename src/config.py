@@ -17,7 +17,7 @@ Return the result strictly matching the given schema."""
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-CV_PATH = PROJECT_ROOT / "src" / "data" / "CV_Mikolaj_Cieslinski-doc_tailored.docx"
+CV_PATH = PROJECT_ROOT / "src" / "data" / "CV_Mikolaj_Cieslinski-doc.docx"
 
 CV_PROMPT = """You are an expert CV parser. Your only task is to extract structured information from the provided CV text.
 
@@ -108,25 +108,79 @@ CV_TAILORED_NODE_SYSTEM_MESSAGE="""You are an expert CV tailoring specialist.
 
 Your task is to adapt the candidate's existing CV to better match the given job offer.
 
+CRITICAL: Check the "Rewrite style" field in the input. If it says "strong_rewrite", you MUST completely rewrite EVERY bullet point from scratch. Do NOT keep the original wording.
+
 Strict rules you MUST follow:
-- NEVER invent new work experience, companies, job titles, dates, or skills that are not already present in the CV.
-- You may only:
-  - Improve / rewrite the professional summary
-  - Reorder or emphasize existing skills that are relevant to the offer
-  - Rephrase existing experience bullets to better highlight relevant achievements and technologies
+- NEVER invent new work experience, companies, job titles, or dates.
 - Keep all company names, job titles, and dates exactly as they appear in the original CV.
 - Do not remove real experience just because it is less relevant.
 - Be honest and precise. Prefer under-editing over fabricating.
 - If reviewer feedback is provided, re-tailor the CV from scratch and explicitly apply that feedback as the primary correction signal.
 - Use the company research profile to tailor emphasis in the summary, skills ordering, and experience bullet phrasing so it matches the company's context.
-- If company research fields are missing or unknown, fall back to tailoring against the offer only.
+- NEVER DUPLICATE bullets within the same experience entry or across entries. Each bullet must be unique.
+- Each experience entry should have its OWN unique bullets based on that specific role.
+
+REWRITE STYLE GUIDE (follow strictly based on the selected style):
+
+### conservative
+- Make MINIMAL changes - only reorder skills to put relevant ones first
+- Keep summary almost unchanged (only minor keyword additions if absolutely necessary)
+- Do NOT rephrase experience bullets - keep them exactly as they are
+- Only add confirmed_additions as new bullets, nothing else
+
+### polished
+- Rewrite summary to better highlight relevant experience
+- Reorder skills and add confirmed skills
+- Lightly rephrase experience bullets to include relevant keywords from the job offer
+- Add confirmed_additions as new bullets
+- Fix obvious grammar/spelling errors
+
+### strong_rewrite
+THIS IS A COMPLETE REWRITE. You MUST:
+1. COMPLETELY rewrite the professional summary from scratch - make it compelling, professional, and perfectly targeted to this job offer
+2. Reorder and optimize skills section
+3. REWRITE EVERY SINGLE BULLET POINT from scratch. The new text MUST be significantly different from the original:
+   - Start with strong action verbs (Developed, Implemented, Led, Architected, Optimized, etc.)
+   - Add quantifiable achievements where possible (percentages, numbers, timeframes)
+   - Include relevant technologies/keywords from the job offer
+   - Make each bullet concise, impactful, and professional
+   - DO NOT just copy the original bullet with minor word changes
+4. Add confirmed_additions as polished, professional bullets
+5. The result should read like a CV written by a professional CV writer
+
+EXAMPLE of strong_rewrite transformation:
+- BEFORE: "Working on multiple clients' projects from various sectors, including banking, HR, and consulting."
+- AFTER: "Delivered high-impact Angular applications for enterprise clients across banking, HR, and consulting sectors, consistently meeting tight deadlines and exceeding quality standards."
+
+Interview clarifications rules:
+- For strong_rewrite: ALWAYS rewrite ALL bullets regardless of rewrite_permission.
+- Use confirmed skill_years to mention specific years of experience in summary or relevant bullets.
+- Use confirmed_additions to ADD NEW BULLETS to the specific experience entry indicated by "where" field.
+- NEVER add anything from rejected_gaps - the candidate explicitly said they do not have this experience.
+- If languages are confirmed (e.g., "Polish - native, English - fluent"), include them in the languages field.
+
+IMPORTANT: 
+- Do NOT put everything in the summary. Distribute confirmed_additions as new bullets in the appropriate experience entries.
+- Each experience entry must have UNIQUE bullets. Do not copy bullets from one entry to another.
+- For strong_rewrite: If a bullet in your output looks similar to the original, REWRITE IT AGAIN.
 
 Return the result strictly matching the given schema."""
 
 CV_TAILORED_NODE_HUMAN_MESSAGE="""Tailor the following CV to better match this job offer.
 
+REWRITE STYLE: {clarifications_style}
+(If this is "strong_rewrite", you MUST completely rewrite every bullet point. Do NOT keep original wording.)
+
 ### Reviewer feedback (optional)
 {tailored_cv_feedback}
+
+### Interview clarifications (from candidate)
+Rewrite style: {clarifications_style}
+Rewrite permission: {clarifications_rewrite_permission}
+Confirmed skill years: {clarifications_skill_years}
+Confirmed additions (gaps to add): {clarifications_confirmed_additions}
+Rejected gaps (do NOT add): {clarifications_rejected_gaps}
+Confirmed languages: {clarifications_languages}
 
 ### Job Offer
 Title: {offer.title}
@@ -165,7 +219,10 @@ Experience:
 {cv.experience}
 
 Education:
-{cv.education}"""
+{cv.education}
+
+Languages:
+{cv.languages}"""
 
 DEFAULT_JOB_OFFER_URL = "https://justjoin.it/job-offer/comarch-angular-developer-warszawa-javascript-d725926d"
 DEMO_JOB_OFFER_URL = "https://nofluffjobs.com/job/senior-java-cloud-developer-azure-dahliamatic-warszawa-1"
@@ -244,13 +301,14 @@ You will receive:
 Your job is to decide which paragraphs should be updated and what their new text should be.
 
 Strict rules:
-- Only change content related to: professional summary, skills, and experience bullets.
+- Change content related to: professional summary, skills, experience bullets, education, and languages.
 - NEVER change company names, job titles, or dates.
 - NEVER add new work experience entries.
 - NEVER invent skills or achievements that are not present in the TailoredCV.
 - Keep bullet point markers (-, •, *) if they exist.
 - Return the minimal set of changes necessary.
-- If a section does not exist in the original document, do not try to create it.
+- If a section header exists but is empty (e.g., "LANGUAGES & EDUCATION" with no content below), you SHOULD fill it with the provided education/languages data.
+- Look for empty paragraphs or placeholder paragraphs near section headers and replace them with the appropriate content.
 
 Return only the structured list of changes.
 """
@@ -271,5 +329,47 @@ Skills:
 Experience:
 {experience}
 
+Education:
+{education}
+
+Languages:
+{languages}
+
 Return the list of paragraph changes needed.
+"""
+
+CV_INTERVIEW_NODE_PROMPT = """
+You are a CV intake interviewer.
+
+Ask ONE question at a time.
+
+Cover:
+1. Whether the candidate still wants to apply, given the fit score and company type
+2. Rewrite style - ask which one they prefer:
+   - "conservative" = minimal changes, only reorder skills
+   - "polished" = light rephrasing, fix grammar
+   - "strong_rewrite" = completely rewrite all bullets professionally
+3. Permission to rewrite existing bullets
+4. Years of experience for the most important offer skills
+5. Each important fit gap: do they have it, where, how to phrase it
+6. Language proficiencies (if required by the job offer)
+
+Rules:
+- Never invent experience.
+- If they do not want to apply, say so in assistant_message and do not fill clarifications.
+- If they reject a gap, put it in rejected_gaps.
+- confirmed_additions only when they explicitly confirm the experience.
+- Set is_complete=true only when the checklist is done and they want to proceed.
+- IMPORTANT: When setting clarifications.style, use EXACTLY one of: "conservative", "polished", "strong_rewrite" (with underscore, no spaces).
+- If user says "strong rewrite" or "complete rewrite" or similar, set style to "strong_rewrite".
+"""
+
+CV_INTERVIEW_CONTEXT = """
+Offer: {offer}
+CV: {cv}
+Fit score: {fit_score}
+Fit gaps: {fit_gaps}
+Fit rationale: {fit_rationale}
+Company: {company_name} ({company_type})
+{company_summary}
 """
