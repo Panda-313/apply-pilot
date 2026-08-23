@@ -8,7 +8,6 @@ from .nodes.cv_tailor_human_approval import cv_tailor_human_approval_node
 from .nodes.cv_interview import cv_interview_node
 from .nodes.fit_analyst import fit_analyst_node
 from src import State
-from .nodes.fit_analyst_human_approval import fit_analyst_human_approval_node
 from .router import fit_analysis_router, cv_tailored_router, cv_interview_router
 
 
@@ -18,7 +17,6 @@ def build_graph(checkpointer=None):
 
     builder = StateGraph(State)
     builder.add_node("fit_analyst_node", fit_analyst_node)
-    builder.add_node("analyst_human_approval_node", fit_analyst_human_approval_node)
     builder.add_node("company_research_node", company_research_node)
     builder.add_node("cv_interview_node", cv_interview_node)
     builder.add_node("cv_tailor_node", cv_tailor_node)

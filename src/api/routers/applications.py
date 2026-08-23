@@ -6,7 +6,6 @@ from fastapi.responses import StreamingResponse
 
 from src.api.exceptions import ConflictError, NotFoundError, UnprocessableEntityError
 from src.api.schemas import AllowedActions, Payload, DecisionRequest, InterviewMessageRequest, InterviewMessage
-from src.config import CV_PATH
 from src.api.services import ApplicationService, ParsingService
 from src.api.schemas import NewApplicationResponse, NewApplicationRequest
 from src.services import apply_cv_edits
@@ -94,11 +93,15 @@ def create_application(
         application_service: ApplicationServiceDep,
         request: NewApplicationRequest = Depends(),
 ):
-    structured_cv = parsing_service.parse_cv(request.cv)
+    parsed_cv = parsing_service.parse_cv(request.cv)
     offer_result = parsing_service.fetch_offer(request.offer_url)
     structured_offer = parsing_service.parse_offer(offer_result)
 
-    state, config_id = application_service.create_application(structured_cv, structured_offer)
+    state, config_id = application_service.create_application(
+        parsed_cv.structured_cv,
+        structured_offer,
+        cv_file_path=parsed_cv.file_path,
+    )
 
     return _to_application_response(config_id, state)
 
@@ -167,10 +170,17 @@ def get_cv(id: str, service: ApplicationServiceDep):
             message="Tailored CV is not ready yet.",
         )
 
+    cv_file_path = application.get("cv_file_path")
+    if cv_file_path is None:
+        raise ConflictError(
+            code="cv_file_not_found",
+            message="Original CV file path is not available.",
+        )
+
     with NamedTemporaryFile(suffix=".docx", delete=False) as tmp_file:
         output_path = tmp_file.name
 
-    generated_path = apply_cv_edits(CV_PATH, tailored_cv, output_path)
+    generated_path = apply_cv_edits(cv_file_path, tailored_cv, output_path)
     try:
         with open(generated_path, "rb") as file:
             content = file.read()

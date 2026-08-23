@@ -12,6 +12,7 @@ from src.state_updates import CompanyResearchUpdate, FitAnalystUpdate, CVTailorU
 class BaseState(TypedDict):
     offer: StructuredOffer
     cv: StructuredCV
+    cv_file_path: Optional[str]
     analysis_feedback: Optional[str]
     tailored_cv_feedback: Optional[str]
     mail_draft: Optional[str]

@@ -1,4 +1,6 @@
-from typing import cast
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+from typing import NamedTuple, cast
 from zipfile import BadZipFile
 
 from docx import Document
@@ -16,8 +18,13 @@ from src.services import parse_cv, fetch_job
 from src.services.parse_offer import parse_offer
 
 
+class ParsedCV(NamedTuple):
+    structured_cv: StructuredCV
+    file_path: str
+
+
 class ParsingService:
-    def parse_cv(self, cv: UploadFile) -> StructuredCV:
+    def parse_cv(self, cv: UploadFile) -> ParsedCV:
         filename = (cv.filename or "").lower()
         if not filename.endswith(".docx"):
             raise UnprocessableEntityError(
@@ -25,15 +32,20 @@ class ParsingService:
                 message="CV file must be a .docx document.",
             )
 
+        with NamedTemporaryFile(suffix=".docx", delete=False) as tmp_file:
+            tmp_file.write(cv.file.read())
+            cv_file_path = tmp_file.name
+
         try:
-            doc = Document(cv.file)
+            doc = Document(cv_file_path)
         except (PackageNotFoundError, BadZipFile, ValueError):
+            Path(cv_file_path).unlink(missing_ok=True)
             raise UnprocessableEntityError(
                 code="invalid_cv_file",
                 message="Provided CV file is not a valid .docx document.",
             )
 
-        return parse_cv(doc)
+        return ParsedCV(structured_cv=parse_cv(doc), file_path=cv_file_path)
 
     def parse_offer(self, job_result: FetchJobResult) -> StructuredOffer:
         if job_result["status"] == "failed":

@@ -23,12 +23,13 @@ class ApplicationService:
             }
         }
 
-    def create_application(self, structured_cv, structured_offer):
+    def create_application(self, structured_cv, structured_offer, cv_file_path: str):
         self._ensure_graph()
 
         initial_state: State = {
             "offer": structured_offer,
             "cv": structured_cv,
+            "cv_file_path": cv_file_path,
             "fit_score": None,
             "fit_gaps": [],
             "fit_analysis_cv_source": None,
