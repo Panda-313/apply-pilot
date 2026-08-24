@@ -27,8 +27,6 @@ ApplyPilot does the opposite:
 - strict **no fabricated experience** rule
 - thin FastAPI API
 
-This is a portfolio project aimed at **Applied AI / LLM engineering** roles.
-
 ---
 
 ## Architecture
